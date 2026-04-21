@@ -1,0 +1,33 @@
+name: Temperatures Diàries
+
+on:
+  schedule:
+    - cron: '59 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  obtenir-temperatures:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositori
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instal·lar dependències
+        run: pip install requests
+
+      - name: Executar programa temperatures
+        run: python temperatures.py
+
+      - name: Pujar fitxer JSON al repositori
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add temp_*.json
+          git commit -m "Temperatures del dia $(date +'%Y-%m-%d')" || echo "Res a committejar"
+          git push
